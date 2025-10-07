@@ -17,6 +17,10 @@
  * 
  *          - npm install prisma --save         -> Realiza a coneção com o banco de dados
  *          - npm install @prima/client --save  -> Permite execultar scripts SQL no banco de dados
+ *          - npx prisma migrate dev            -> Permite sincronizar o prisma com o DB, modelar o DB conforme as configurações do ORM
+ *                                                 Cuidado: faz reset no DB
+ *          - npx prisma migrate reset          -> reset no DB
+ *          - npx prisma generate               -> sicronismo com DB
  *  
  * * Dependencia do node para bancos de dados NÃO relacional
  *              Mongoose    -> biblioteca para acesso a banco de dados não relacional (MongoDB)
@@ -35,7 +39,8 @@
  ***********************************************************************************************************************************************/
 
 //Import da biblioteca do PrismaClient
-const { PrismaClient } = require("@prisma/client")
+// const { PrismaClient } = require("@prisma/client")
+const { PrismaClient } = require("../../generated/prisma")
 
 //cria o objeto do prisma client para manipular os scripts SQL
 const prisma = new PrismaClient()
@@ -55,7 +60,6 @@ const getSelectAllFilms = async function(){
         }
     } catch (error) {
         console.log(error)
-
         return false
     }
 }
