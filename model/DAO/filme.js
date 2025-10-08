@@ -53,7 +53,8 @@ const getSelectAllFilms = async function(){
         //Executa no DB
         let result = await prisma.$queryRawUnsafe(sql)
 
-        if(result.length > 0){
+        //Validação para identificar se o retorna o Array é vazio ou com dados
+        if(Array.isArray(result)){
             return result
         }else{
             return false
@@ -66,7 +67,22 @@ const getSelectAllFilms = async function(){
 
 //Retora o filme por um ID do banco de dados
 const getSelectByIdFilms = async function(id){
-    
+    try {
+        //Script SQL
+        let sql = `select * from tbl_filme where id=${id}`
+        //Executa no DB
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        //Validação para identificar se o retorna o Array é vazio ou com dados
+        if(Array.isArray(result)){
+            return result
+        }else{
+            return false
+        }
+    } catch (error) {
+        console.log(error)
+        return false
+    }
 }
 
 //Insere um filme no banco de dados 
@@ -84,5 +100,6 @@ const setDeleteFilms = async function(id){
 
 }
 module.exports = {
-    getSelectAllFilms
+    getSelectAllFilms,
+    getSelectByIdFilms
 }

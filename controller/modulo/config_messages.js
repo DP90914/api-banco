@@ -1,3 +1,5 @@
+const { status } = require("express/lib/response")
+
 /************************************************************************************************************************************************
  * Objetivo: arquivo responsavel pela padronização de todas a mensagens da API projetos de Filmes
  * Data: 07/10/2025
@@ -6,7 +8,7 @@
 *******************************************************************************************************************************************************/
 const dataAtual = new Date()
 /****************************************************MENSAGENS DE PADRONIZAÇÃO DO PROJETO**************************************************************/
-const MESSAGE_HEADER = {
+const HEADER = {
     development: "Gustavo de Paula Silva",
     api_description: "api para manipular a locadora de filmes",
     version: "1.0.10.25",
@@ -17,10 +19,33 @@ const MESSAGE_HEADER = {
 }
 /********************************************************MENSAGENS DE ERRO DO PROJETO******************************************************************/
 
+const ERROR_NOT_FOUND = {
+    status: false,
+    status_code: 404,
+    message: "dados NÃO foram encontrados"
+}
+
+const ERROR_INTERNAL_SERVER_MODEL = {
+    status: false,
+    status_code: 500,
+    message: "NÃO foi possivel processar a requisição, devido a problemas na camada da modelagem de dados!!!",
+}
+
+const ERROR_INTERNAL_SERVER_CONTROLLER = {
+    status: false,
+    status_code: 500,
+    message: "NÃO foi possivel processar a requisição, devido a problemas na camada da controle de dados!!!",
+}
+
+const ERROR_REQUIRED_FIELDS ={
+    status: false,
+    status_code: 400, 
+    message: "NÃO foi possivel processar a requisição, devido a campos obrigatorios que NÃO foram enviados corretamente, conforme a documentação da API!!!"
+}
 /*******************************************************MENSAGENS DE SUCESSO DO PROJETO****************************************************************/
-const MESSAGE_SUCESS_REQUEST = {
+const SUCESS_REQUEST = {
     status: true,
-    statuscode: 200,
+    status_code: 200,
     message: "Requisição bem sucedida!!!"
 }
 
@@ -29,6 +54,11 @@ const MESSAGE_SUCESS_REQUEST = {
 
 
 module.exports = {
-    MESSAGE_HEADER,
-    MESSAGE_SUCESS_REQUEST
+    HEADER,
+    SUCESS_REQUEST,
+    ERROR_NOT_FOUND,
+    ERROR_INTERNAL_SERVER_MODEL,
+    ERROR_INTERNAL_SERVER_CONTROLLER,
+    ERROR_REQUIRED_FIELDS
+
 }
