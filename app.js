@@ -14,9 +14,11 @@
  *                  Response    -> Envia os dados na API
 ************************************************************************************************************************************************/
 //import das dependencias 
-const express       = require('express')
-const cors          = require('cors')
-const bodyParser    = require('body-parser')
+const express           = require('express')
+const cors              = require('cors')
+const bodyParser        = require('body-parser')
+//criar um objeto especialisa no formato JSON para receber os dados do body (POST & PUT)
+const bodyParserJSON    = bodyParser.json()
 
 
 
@@ -53,8 +55,20 @@ app.get("/v1/locadora/filme/:id", cors(), async function (request, response) {
     let filme = await controllerFilms.buscarFilmeId(idFilme)
     response.status(filme.status_code)
     response.json(filme)  
- })
- 
+})
+
+//Insere um novo filme no DB
+app.post('/v1/locadora/filme', cors(), bodyParserJSON, async function(request, response) {
+  // Recebe o objeto JSON pelo body da requisição
+    let dadosBody = request.body
+    // Recebe o content-type da requisição
+    let contentType = request.headers['content-type']
+
+    // chama a função da controller para inserir o filme, enviamos os dados do body e o content-text
+    let filme = await controllerFilms.inserirFilme(dadosBody, contentType)
+    response.status(filme.status_code)
+    response.json(filme)
+})
 
 app.listen(PORT, function(){
     console.log("API Aguardando requisições")
