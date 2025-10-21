@@ -69,6 +69,27 @@ app.post('/v1/locadora/filme', cors(), bodyParserJSON, async function(request, r
     response.status(filme.status_code)
     response.json(filme)
 })
+app.put('/v1/locadora/filme/:id',cors(), bodyParserJSON, async function(request, response) {
+    //recebe dados do body
+    let dadosBody = request.body
+
+    //recebe o id pela url
+    let idFilme = request.params.id
+
+    //recebe o content-type
+    let contentType = request.headers['content-type']
+
+    let filme = await controllerFilms.atualizarFilme(dadosBody, idFilme, contentType)
+    response.status(filme.status_code)
+    response.json(filme)
+})
+app.delete("/v1/locadora/filme/:id", cors(), async function (request, response) {
+    //recebe o id via parametro
+    let idFilme = request.params.id
+    let filme = await controllerFilms.excluirFilme(idFilme)
+    response.status(filme.status_code)
+    response.json(filme)  
+})
 
 app.listen(PORT, function(){
     console.log("API Aguardando requisições")
