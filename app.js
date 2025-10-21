@@ -89,7 +89,12 @@ app.delete("/v1/locadora/filme/:id", cors(), async function (request, response) 
     response.status(filme.status_code)
     response.json(filme)  
 })
-
+// crud dos generos
+app.get("/v1/locadora/filme", cors(), async function (request, response) {
+    let filme = await controllerFilms.listarFilmes()
+    response.status(filme.status_code)
+    response.json(filme)  
+ })
 app.listen(PORT, function(){
     console.log("API Aguardando requisições")
 })
