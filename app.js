@@ -56,7 +56,6 @@ app.get("/v1/locadora/filme/:id", cors(), async function (request, response) {
     response.status(filme.status_code)
     response.json(filme)  
 })
-
 //Insere um novo filme no DB
 app.post('/v1/locadora/filme', cors(), bodyParserJSON, async function(request, response) {
   // Recebe o objeto JSON pelo body da requisição

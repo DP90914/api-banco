@@ -40,12 +40,10 @@ const listarFilmes = async function() {
 const buscarFilmeId = async function(id) {
     //realizando uma copia do odjeto MESSAGE_DEFAUT, permitindo que as alterações desta função não interfira nas demais
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
-
     try {
         // validação de campo obrigatorio
         if(id != '' && id != null && id != undefined && !isNaN(id) && id > 0){
             let result = await filmeDAO.getSelectByIdFilms(parseInt(id))
-
             if(result){
                 if(result.length > 0){
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
@@ -75,13 +73,21 @@ const inserirFilme = async function(filme, contentType) {
             //chama a função de validação dos dados de cadastro
             let validarDados = await validarDadosFilme(filme)
             if(!validarDados){
-
                 let result = await filmeDAO.setInsertFilm(filme)
                 if(result){
-                    MESSAGE.HEADER.status       =   MESSAGE.SUCESS_CREATED_ITEM.status
-                    MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_CREATED_ITEM.status_code
-                    MESSAGE.HEADER.message      =   MESSAGE.SUCESS_CREATED_ITEM.message
-                    return MESSAGE.HEADER
+                    //Chama a função para receber o ID gerado no DB
+                    let lastIdFilme = await filmeDAO.getSelectLastIdfilm()
+                    if(lastIdFilme){
+                        //Adiciona no JSON o id criado no DB
+                        filme.id                    =   lastIdFilme 
+                        MESSAGE.HEADER.status       =   MESSAGE.SUCESS_CREATED_ITEM.status
+                        MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_CREATED_ITEM.status_code
+                        MESSAGE.HEADER.message      =   MESSAGE.SUCESS_CREATED_ITEM.message
+                        MESSAGE.HEADER.response     =   filme
+                        return MESSAGE.HEADER
+                    }else{
+                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL //500
+                    }
                 }else{
                     return MESSAGE.ERROR_NOT_FOUND //404
                 }
