@@ -61,6 +61,7 @@ const getSelectLastIdGenero = async function(){
 
         //Validação para identificar se o retorna o Array é vazio ou com dados
         if(Array.isArray(result)){
+            console.log(result)
             return Number(result[0].id)
         }else{
             return false
@@ -92,7 +93,7 @@ const setInsertGenero = async function(genero){
 const setUpdateGenero = async function(genero){
     try {
         let sql =  `UPDATE tbl_genero set
-                        nome = '${genero.nome}', 
+                        nome = '${genero.nome}'
                     where id = ${genero.id}`
         //$executeRawUnsafe() -> permite apenas exeultar scripts SQL que não tem retorno de dados(INSERT, UPDATE, DELETE)
         let result = await prisma.$executeRawUnsafe(sql)

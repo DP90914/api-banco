@@ -38,6 +38,9 @@ app.use((request, response, next) =>{
 })
 //import dos controller
 const controllerFilms = require("./controller/filme/controller_filme.js")
+const controllerGeneros = require("./controller/genero/controller_genero.js")
+const controllerClassificacao = require("./controller/classificacao/controller_classificacao.js")
+const controllerAtor = require("./controller/ator/controller_ator.js")
 
 
 // Endpoint para o CRUD de Filmes
@@ -89,12 +92,97 @@ app.delete("/v1/locadora/filme/:id", cors(), async function (request, response) 
     response.status(filme.status_code)
     response.json(filme)  
 })
-// crud dos generos
-app.get("/v1/locadora/filme", cors(), async function (request, response) {
-    let filme = await controllerFilms.listarFilmes()
-    response.status(filme.status_code)
-    response.json(filme)  
- })
+// crud generos
+app.get("/v1/locadora/genero", cors(), async function (request, response) {
+    let genero = await controllerGeneros.listarGeneros()
+    response.status(genero.status_code)
+    response.json(genero)  
+})
+app.get("/v1/locadora/genero/:id", cors(), async function (request, response) {
+    let idGenero = request.params.id
+    let genero = await controllerGeneros.buscarGeneroId(idGenero)
+    response.status(genero.status_code)
+    response.json(genero)  
+})
+app.post("/v1/locadora/genero", cors(), bodyParserJSON, async function (request, response) {
+    let dadosBody = request.body
+    // Recebe o content-type da requisição
+    let contentType = request.headers['content-type']
+
+    let genero = await controllerGeneros.inserirGenero(dadosBody, contentType)
+    response.status(genero.status_code)
+    response.json(genero)  
+})
+app.put("/v1/locadora/genero/:id", cors(), bodyParserJSON, async function(request, response){
+    //recebe dados do body
+    let dadosBody = request.body
+
+    //recebe o id pela url
+    let idGenero = request.params.id
+
+    //recebe o content-type
+    let contentType = request.headers['content-type']
+
+    let genero = await controllerGeneros.atualizarGenero(dadosBody, idGenero, contentType)
+    response.status(genero.status_code)
+    response.json(genero)  
+})
+app.delete("/v1/locadora/genero/:id", cors(), async function(request, response){
+    let idGenero = request.params.id
+    let genero = await controllerGeneros.excluirGenero(idGenero)
+    response.status(genero.status_code)
+    response.json(genero)  
+
+})
+//crud classificação
+app.get("/v1/locadora/classificacao", cors(), async function(request, response){
+    let classificacao = await controllerClassificacao.listarClassificacao()
+    response.status(classificacao.status_code)
+    response.json(classificacao)
+})
+app.get("/v1/locadora/classificacao/:id", cors(), async function(request, response){
+    let idClassificacao = request.params.id
+    let classificacao = await controllerClassificacao.buscarClassificacaoId(idClassificacao)
+    response.status(classificacao.status_code)
+    response.json(classificacao)
+})
+app.post("/v1/locadora/classificacao", cors(), bodyParserJSON, async function(request,response){
+    let dadosBody = request.body
+    let contentType = request.headers['content-type']
+    let classificacao = await controllerClassificacao.inserirClassificacao(dadosBody, contentType)
+    response.status(classificacao.status_code)
+    response.json(classificacao)  
+})
+app.put("/v1/locadora/classificacao/:id", cors(), bodyParserJSON, async function(request,response){
+    let dadosBody = request.body
+
+    let idClassificacao = request.params.id
+
+    let contentType = request.headers['content-type']
+
+    let classificacao = await controllerClassificacao.atualizarClassificacao(dadosBody, idClassificacao, contentType)
+    response.status(classificacao.status_code)
+    response.json(classificacao)  
+
+})
+app.delete("/v1/locadora/classificacao/:id", cors(), async function(request,response){
+    let idClassificacao = request.params.id
+    
+    let classificacao = await controllerClassificacao.excluirClassificacao(idClassificacao)
+    response.status(classificacao.status_code)
+    response.json(classificacao)  
+})
+app.get("/v1/locadora/ator", cors(), async function(request, response){
+    let ator = await controllerAtor.listarAtor()
+    response.status(ator.status_code)
+    response.json(ator)
+})
+app.get("/v1/locadora/ator/:id", cors(), async function(request, response){
+    let idAtor = request.params.id
+    let ator = await controllerAtor.buscarAtorById(idAtor)
+    response.status(ator.status_code)
+    response.json(ator)
+})
 app.listen(PORT, function(){
     console.log("API Aguardando requisições")
 })

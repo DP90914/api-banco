@@ -31,7 +31,7 @@ const listarGeneros = async function() {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-const buscarGenero = async function(id) {
+const buscarGeneroId = async function(id) {
         //realizando uma copia do odjeto MESSAGE_DEFAUT, permitindo que as alterações desta função não interfira nas demais
         let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
         try {
@@ -43,7 +43,6 @@ const buscarGenero = async function(id) {
                         MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                         MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
                         MESSAGE.HEADER.response.genero = result
-                        console.log(MESSAGE.HEADER)
                         return MESSAGE.HEADER
                     }else{
                         return MESSAGE.ERROR_NOT_FOUND //404
@@ -101,9 +100,10 @@ const atualizarGenero = async function(genero, id, contentType) {
                 MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
-                let validarID = await buscarGenero(id)
+                let validarID = await buscarGeneroId(id)
                 if(validarID.status_code == 200){
-                    let result = await generoDAO.setUpdateGenero()
+                    genero.id = parseInt(id)
+                    let result = await generoDAO.setUpdateGenero(genero)
                     if(result){
                         MESSAGE.HEADER.status       =   MESSAGE.SUCESS_UPDATED_ITEM.status
                         MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_UPDATED_ITEM.status_code
@@ -127,27 +127,22 @@ const atualizarGenero = async function(genero, id, contentType) {
 const excluirGenero = async function(id) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
-        if(genero.nome == '' || genero.nome == null || genero.nome == undefined || genero.nome.length > 100){
-            MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
-            return MESSAGE.ERROR_REQUIRED_FIELDS//400
-        }else{
-            let validarID = await buscarGenero(id)
-            if(validarID.status_code == 200){
-                let result = await generoDAO.setDeleteGenero(parseInt(id))
-                if(result){
-                    MESSAGE.HEADER.status       =   MESSAGE.SUCESS_DELETED_ITEM.status
-                    MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_DELETED_ITEM.status_code
-                    MESSAGE.HEADER.message      =   MESSAGE.SUCESS_DELETED_ITEM.message
-                    MESSAGE.HEADER.response     =   genero
-                    return MESSAGE.HEADER //200
-                }else{
-                    return MESSAGE.ERROR_NOT_FOUND//404
-                }
+        let validarDados = await buscarGeneroId(id)
+        if(validarDados.status_code == 200){
+            let result = await generoDAO.setDeleteGenero(parseInt(id))
+            if(result){
+                MESSAGE.HEADER.status       =   MESSAGE.SUCESS_DELETED_ITEM.status
+                MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_DELETED_ITEM.status_code
+                MESSAGE.HEADER.response     =   MESSAGE.SUCESS_DELETED_ITEM.message
+                return MESSAGE.HEADER //200
             }else{
-                MESSAGE.ERROR_NOT_FOUND.invalid_field =  'atributo [ID] invalido'
-                return MESSAGE.ERROR_REQUIRED_FIELDS // 400
+                return MESSAGE.ERROR_NOT_FOUND//404
             }
+        }else{
+            MESSAGE.ERROR_NOT_FOUND.invalid_field =  'atributo [ID] invalido'
+            return MESSAGE.ERROR_REQUIRED_FIELDS // 400
         }
+    
     }catch (error) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
@@ -155,7 +150,7 @@ const excluirGenero = async function(id) {
 //Revizar
 module.exports = {
     listarGeneros,
-    buscarGenero,
+    buscarGeneroId,
     inserirGenero,
     atualizarGenero,
     excluirGenero
