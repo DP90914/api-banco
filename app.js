@@ -41,6 +41,7 @@ const controllerFilms = require("./controller/filme/controller_filme.js")
 const controllerGeneros = require("./controller/genero/controller_genero.js")
 const controllerClassificacao = require("./controller/classificacao/controller_classificacao.js")
 const controllerAtor = require("./controller/ator/controller_ator.js")
+const controllerDiretor = require("./controller/diretor/controller_diretor.js")
 
 
 // Endpoint para o CRUD de Filmes
@@ -182,6 +183,45 @@ app.get("/v1/locadora/ator/:id", cors(), async function(request, response){
     let ator = await controllerAtor.buscarAtorById(idAtor)
     response.status(ator.status_code)
     response.json(ator)
+})
+app.post("/v1/locadora/ator", cors(), bodyParserJSON, async function(request, response) {
+    let dadosBody = request.body
+    let contentType = request.headers["content-type"]
+    let ator = await controllerAtor.inserirAtor(dadosBody, contentType)
+    response.status(ator.status_code)
+    response.json(ator)
+})
+app.put("/v1/locadora/ator/:id", cors(), bodyParserJSON, async function(request,response){
+    let dadosBody = request.body
+
+    let idAtor = request.params.id
+
+    let contentType = request.headers['content-type']
+
+    let ator = await controllerAtor.atualizarAtor(dadosBody, idAtor, contentType)
+    response.status(ator.status_code)
+    response.json(ator)  
+
+})
+app.delete("/v1/locadora/ator/:id", cors(), async function(request, response){
+    let idAtor = request.params.id
+    let ator = await controllerAtor.excluirAtor(idAtor)
+    response.status(ator.status_code)
+    response.json(ator)  
+
+})
+
+app.get("/v1/locadora/diretor", cors(), async function(request, response) {
+    let diretor = await controllerDiretor.listarDiretor()
+    response.status(diretor.status_code)
+    response.json(diretor)
+})
+
+app.get("/v1/locadora/diretor/:id", cors(), async function(request, response){
+    let idDiretor = request.params.id
+    let diretor = await controllerDiretor.listarDiretorById(idDiretor)
+    response.status(diretor.status_code)
+    response.json(diretor)
 })
 app.listen(PORT, function(){
     console.log("API Aguardando requisições")

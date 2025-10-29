@@ -41,7 +41,7 @@ const buscarAtorById = async function(id) {
                 if(result.length > 0){
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                     MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                    MESSAGE.HEADER.response.classificacao = result
+                    MESSAGE.HEADER.response.ator = result
                     return MESSAGE.HEADER
                 }else{
                     return MESSAGE.ERROR_NOT_FOUND //404
@@ -57,8 +57,128 @@ const buscarAtorById = async function(id) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
+const inserirAtor = async function(ator, contentType) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    try {
+        if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+            let validarDados = await validarDadosAtor(ator)
+            if(!validarDados){
+                let result = await AtorDAO.setInsertAtor(ator)
+                if(result){
+                    let lastIdAtor = await AtorDAO.getSelectLastIdAtor()
+                    if(lastIdAtor){
+                        ator.id = lastIdAtor
+                        MESSAGE.HEADER.status       =   MESSAGE.SUCESS_CREATED_ITEM.status
+                        MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_CREATED_ITEM.status_code
+                        MESSAGE.HEADER.message      =   MESSAGE.SUCESS_CREATED_ITEM.message
+                        MESSAGE.HEADER.response     =   ator
+                        return MESSAGE.HEADER
+                    }else{
+                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL // 500
+                    }
+                }else{
+                    return MESSAGE.ERROR_NOT_FOUND //404
+                }
+            }else{
+                return validarDados
+            }
+        }else{
+            return MESSAGE.ERROR_CONTENT_TYPE
+        }
 
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+
+const atualizarAtor = async function(ator, id,contentType) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    try{
+        if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
+            let validarDados = await validarDadosAtor(ator)
+            if(!validarDados){
+                let validarID = await buscarAtorById(id)
+                if(validarID.status_code == 200){
+                    // Adicionado o ID no JSon com os dados do filme
+                    ator.id = parseInt(id)
+                    let result = await AtorDAO.setUpdateAtor(ator)
+                    if(result){
+                        MESSAGE.HEADER.status       =   MESSAGE.SUCESS_UPDATED_ITEM.status
+                        MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_UPDATED_ITEM.status_code
+                        MESSAGE.HEADER.message      =   MESSAGE.SUCESS_UPDATED_ITEM.message
+                        MESSAGE.HEADER.response     =   ator
+                        return MESSAGE.HEADER //200
+                    }else{
+                        return MESSAGE.ERROR_NOT_FOUND//404
+                    }
+                }else{
+                    return validarID // Retorno da função de buscarFilmeID 400 || 404 || 500
+                }
+            }else{
+                return validarDados // retorno da função de validar dados do filme 400
+            }
+        } else{
+            return MESSAGE.ERROR_CONTENT_TYPE //415
+        }
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+}
+const excluirAtor = async function(id) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    try {
+        // validação de campo obrigatorio
+        let validarDados = await buscarAtorById(id)
+        if(validarDados.status_code == 200){
+            let result = await AtorDAO.setDeleteAtor(parseInt(id))
+
+            if(result){
+                MESSAGE.HEADER.status = MESSAGE.SUCESS_DELETED_ITEM.status
+                MESSAGE.HEADER.status_code = MESSAGE.SUCESS_DELETED_ITEM.status_code
+                MESSAGE.HEADER.response = MESSAGE.SUCESS_DELETED_ITEM.message
+                return MESSAGE.HEADER
+            }else{
+                return MESSAGE.ERROR_NOT_FOUND // 404
+            }
+        }else{
+            MESSAGE.ERROR_NOT_FOUND.invalid_field =  'atributo [ID] invalido'
+            return MESSAGE.ERROR_REQUIRED_FIELDS // 400
+        }
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
+    }
+
+}
+
+
+const validarDadosAtor = async function(ator) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    if(ator.nome == '' || ator.nome == null || ator.nome == undefined || ator.nome.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(ator.genero == '' || ator.genero == null || ator.genero == undefined || ator.genero.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [GENERO] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(ator.data_nascimento == undefined || ator.data_nascimento == "" || ator.data_nascimento == null){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_nascimento] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(ator.biografia == null || ator.biografia == undefined || ator.biografia == ""){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [biografia] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(ator.data_morte == undefined){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_morte] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(ator.img_ator == undefined){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [img_ator] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    }else{
+        return false
+    }
+}
 module.exports = {
     listarAtor,
-    buscarAtorById
+    buscarAtorById,
+    inserirAtor,
+    atualizarAtor,
+    excluirAtor
 }
