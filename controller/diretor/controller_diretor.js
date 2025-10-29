@@ -91,6 +91,31 @@ const inserirDiretor = async function(diretor, contentType) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
+
+const validarDadosDiretor = async function(diretor) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    if(diretor.nome == '' || diretor.nome == null || diretor.nome == undefined || diretor.nome.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(diretor.genero == '' || diretor.genero == null || diretor.genero == undefined || diretor.genero.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [GENERO] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(diretor.data_nascimento == undefined || diretor.data_nascimento == "" || diretor.data_nascimento == null){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_nascimento] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(diretor.biografia == null || diretor.biografia == undefined || diretor.biografia == ""){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [biografia] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(diretor.data_morte == undefined){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_morte] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    } else if(diretor.img_diretor == undefined){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [img_diretor] invalido"
+        return MESSAGE.ERROR_REQUIRED_FIELDS
+    }else{
+        return false
+    }
+}
 module.exports = {
     listarDiretor,
     listarDiretorById
