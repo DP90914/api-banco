@@ -7,19 +7,19 @@
 //Import do arqivo DAO para manipular o CRUD no DB
 const res = require("express/lib/response.js")
 
-const AtorDAO = require("../../model/DAO/ator.js")
+const publicadorDAO = require("../../model/DAO/publicador.js")
 //Import do arquivo que padroniza as menssgens
 const MESSAGE_DEFAUT = require("../modulo/config_messages.js")
 
-const listarAtor = async function(){
+const listarPublicador = async function(){
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
-        let result = await AtorDAO.getAtor()
+        let result = await publicadorDAO.getPublicador()
         if(result){
             if(result.length > 0){
                 MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                 MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                MESSAGE.HEADER.response.generos = result
+                MESSAGE.HEADER.response.publicador = result
                 return MESSAGE.HEADER //200  
             }else{
                 return MESSAGE.ERROR_NOT_FOUND //400
@@ -31,17 +31,17 @@ const listarAtor = async function(){
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500    
     }
 }
-const buscarAtorById = async function(id) {
+const buscarPublicadorById = async function(id) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
         // validação de campo obrigatorio
         if(id != '' && id != null && id != undefined && !isNaN(id) && id > 0){
-            let result = await AtorDAO.getAtorById(parseInt(id))
+            let result = await publicadorDAO.getPublicadorById(parseInt(id))
             if(result){
                 if(result.length > 0){
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                     MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                    MESSAGE.HEADER.response.ator = result
+                    MESSAGE.HEADER.response.publicador = result
                     return MESSAGE.HEADER
                 }else{
                     return MESSAGE.ERROR_NOT_FOUND //404
@@ -57,21 +57,21 @@ const buscarAtorById = async function(id) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
-const inserirAtor = async function(ator, contentType) {
+const inserirPublicador = async function(publicador, contentType) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
         if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
-            let validarDados = await validarDadosAtor(ator)
+            let validarDados = await validarDadosPublicador(publicador)
             if(!validarDados){
-                let result = await AtorDAO.setInsertAtor(ator)
+                let result = await publicadorDAO.setInsertPublicador(publicador)
                 if(result){
-                    let lastIdAtor = await AtorDAO.getSelectLastIdAtor()
-                    if(lastIdAtor){
-                        ator.id = lastIdAtor
+                    let lastIdPublicador = await publicadorDAO.getSelectLastIdPublicador()
+                    if(lastIdPublicador){
+                        publicador.id = lastIdPublicador
                         MESSAGE.HEADER.status       =   MESSAGE.SUCESS_CREATED_ITEM.status
                         MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_CREATED_ITEM.status_code
                         MESSAGE.HEADER.message      =   MESSAGE.SUCESS_CREATED_ITEM.message
-                        MESSAGE.HEADER.response     =   ator
+                        MESSAGE.HEADER.response     =   publicador
                         return MESSAGE.HEADER
                     }else{
                         return MESSAGE.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -91,22 +91,22 @@ const inserirAtor = async function(ator, contentType) {
     }
 }
 
-const atualizarAtor = async function(ator, id,contentType) {
+const atualizarPublicador = async function(publicador, id,contentType) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try{
         if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
-            let validarDados = await validarDadosAtor(ator)
+            let validarDados = await validarDadosPublicador(publicador)
             if(!validarDados){
-                let validarID = await buscarAtorById(id)
+                let validarID = await buscarPublicadorById(id)
                 if(validarID.status_code == 200){
                     // Adicionado o ID no JSon com os dados do filme
-                    ator.id = parseInt(id)
-                    let result = await AtorDAO.setUpdateAtor(ator)
+                    publicador.id = parseInt(id)
+                    let result = await publicadorDAO.setUpdatePublicador(publicador)
                     if(result){
                         MESSAGE.HEADER.status       =   MESSAGE.SUCESS_UPDATED_ITEM.status
                         MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_UPDATED_ITEM.status_code
                         MESSAGE.HEADER.message      =   MESSAGE.SUCESS_UPDATED_ITEM.message
-                        MESSAGE.HEADER.response     =   ator
+                        MESSAGE.HEADER.response     =   publicador
                         return MESSAGE.HEADER //200
                     }else{
                         return MESSAGE.ERROR_NOT_FOUND//404
@@ -124,13 +124,13 @@ const atualizarAtor = async function(ator, id,contentType) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-const excluirAtor = async function(id) {
+const excluirPublicador = async function(id) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
         // validação de campo obrigatorio
-        let validarDados = await buscarAtorById(id)
+        let validarDados = await buscarPublicadorById(id)
         if(validarDados.status_code == 200){
-            let result = await AtorDAO.setDeleteAtor(parseInt(id))
+            let result = await publicadorDAO.setDeletePublicador(parseInt(id))
 
             if(result){
                 MESSAGE.HEADER.status = MESSAGE.SUCESS_DELETED_ITEM.status
@@ -151,34 +151,34 @@ const excluirAtor = async function(id) {
 }
 
 
-const validarDadosAtor = async function(ator) {
+const validarDadosPublicador = async function(publicador) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
-    if(ator.nome == '' || ator.nome == null || ator.nome == undefined || ator.nome.length > 100){
+    if(publicador.nome == '' || publicador.nome == null || publicador.nome == undefined || publicador.nome.length > 100){
         MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
         return MESSAGE.ERROR_REQUIRED_FIELDS//400
-    } else if(ator.genero == '' || ator.genero == null || ator.genero == undefined || ator.genero.length > 100){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [GENERO] invalido'
+    } else if(publicador.logradouro == '' || publicador.logradouro == null || publicador.logradouro == undefined || publicador.logradouro.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [logradouro] invalido'
         return MESSAGE.ERROR_REQUIRED_FIELDS//400
-    } else if(ator.data_nascimento == undefined || ator.data_nascimento == "" || ator.data_nascimento == null){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_nascimento] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(ator.biografia == null || ator.biografia == undefined || ator.biografia == ""){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [biografia] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(ator.data_morte == ''){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_morte] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(ator.img_ator == undefined){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [img_ator] invalido"
+    } else if(publicador.cidade == '' || publicador.cidade == null || publicador.cidade == undefined || publicador.cidade.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [cidade] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(publicador.estado == '' || publicador.estado == null || publicador.estado == undefined || publicador.estado.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [estado] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(publicador.pais == '' || publicador.pais == null || publicador.pais == undefined || publicador.pais.length > 100){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [pais] invalido'
+        return MESSAGE.ERROR_REQUIRED_FIELDS//400
+    } else if(publicador.data_fundacao == undefined || publicador.data_fundacao == "" || publicador.data_fundacao == null){
+        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_fundacao] invalido"
         return MESSAGE.ERROR_REQUIRED_FIELDS
     }else{
         return false
     }
 }
 module.exports = {
-    listarAtor,
-    buscarAtorById,
-    inserirAtor,
-    atualizarAtor,
-    excluirAtor
+    listarPublicador,
+    buscarPublicadorById,
+    inserirPublicador,
+    atualizarPublicador,
+    excluirPublicador
 }

@@ -54,7 +54,7 @@ const setInsertAtor = async function(ator){
                 '${ator.genero}',
                 '${ator.data_nascimento}',
                 '${ator.biografia}',
-                'null',
+                null,
                 '${ator.img_ator}'
             )`
             let result = await prisma.$executeRawUnsafe(sql)

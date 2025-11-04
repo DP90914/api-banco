@@ -55,7 +55,7 @@ const setInsertDiretor = async function(diretor) {
                 '${diretor.genero}',
                 '${diretor.data_nascimento}',
                 '${diretor.biografia}',
-                'null',
+                null,
                 '${diretor.img_diretor}'
             )`
             let result = await prisma.$executeRawUnsafe(sql)
@@ -66,7 +66,7 @@ const setInsertDiretor = async function(diretor) {
             }
 
         } else {
-            let sql = `INSERT INTO tbl_ator(
+            let sql = `INSERT INTO tbl_diretor(
                             nome,
                             genero,
                             data_nascimento,
@@ -93,33 +93,66 @@ const setInsertDiretor = async function(diretor) {
         return false
     }
 }
-const validarDadosDiretor = async function(diretor) {
-    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
-    if(diretor.nome == '' || diretor.nome == null || diretor.nome == undefined || diretor.nome.length > 100){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [NOME] invalido'
-        return MESSAGE.ERROR_REQUIRED_FIELDS//400
-    } else if(diretor.genero == '' || diretor.genero == null || diretor.genero == undefined || diretor.genero.length > 100){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [GENERO] invalido'
-        return MESSAGE.ERROR_REQUIRED_FIELDS//400
-    } else if(diretor.data_nascimento == undefined || diretor.data_nascimento == "" || diretor.data_nascimento == null){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_nascimento] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(diretor.biografia == null || diretor.biografia == undefined || diretor.biografia == ""){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [biografia] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(diretor.data_morte == undefined){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [data_morte] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    } else if(diretor.img_diretor == undefined){
-        MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [img_diretor] invalido"
-        return MESSAGE.ERROR_REQUIRED_FIELDS
-    }else{
+const setUpdateDiretor = async function(diretor) {
+    try{
+        let sql = `update tbl_diretor set
+                        nome = '${diretor.nome}',
+                        genero = '${diretor.genero}',
+                        data_nascimento ="${diretor.data_nascimento}",
+                        data_morte = "${diretor.data_morte}",
+                        biografia = "${diretor.biografia}",
+                        img_diretor = "${diretor.img_diretor}"
+                    where id = ${diretor.id}`
+        let result = await prisma.$executeRawUnsafe(sql)
+        if(result){
+            return true
+        }else{
+            return false
+        }
+    } catch (error) {
         return false
     }
 }
 
+const setDeleteDiretor = async function(id) {
+    try{
+        let sql = `delete from tbl_diretor where id = ${id}`
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        //Validação para identificar se o retorna o Array é vazio ou com dados
+        if(Array.isArray(result)){
+            return result
+        }else{
+            return false
+        }
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+
+}
+
+const getSelectLastIdDiretor = async function() {
+    try{
+        let sql =`select id from tbl_diretor order by id desc limit 1`
+        let result = await prisma.$queryRawUnsafe(sql)
+        if(Array.isArray(result)){
+            return Number(result[0].id)
+        } else{
+            return false
+        }
+    } catch(error){
+        return false
+    }
+}
+
+
+
 module.exports ={
     getDiretor,
     getDiretorById,
-    setInsertDiretor
+    setInsertDiretor,
+    getSelectLastIdDiretor,
+    setUpdateDiretor,
+    setDeleteDiretor
 }
