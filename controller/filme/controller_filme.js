@@ -8,6 +8,7 @@
 //Import do arqivo DAO para manipular o CRUD no DB
 const res = require("express/lib/response.js")
 const filmeDAO = require("../../model/DAO/filme.js")
+const controllerFilmeGenero = require("./controller_filme_genero.js")
 //Import do arquivo que padroniza as menssgens
 const MESSAGE_DEFAUT = require("../modulo/config_messages.js")
 
@@ -78,6 +79,17 @@ const inserirFilme = async function(filme, contentType) {
                     //Chama a função para receber o ID gerado no DB
                     let lastIdFilme = await filmeDAO.getSelectLastIdfilm()
                     if(lastIdFilme){
+                        // Processamento para inserir dados na tabela de relçoes entre filme e genero
+                        // loop para pegar cada genero e enviar oa DAO relacionamento
+                        filme.genero.forEach( async function(genero){
+                            let filmeGenero = {
+                                id_filme : lastIdFilme,
+                                id_genero : genero.id
+                            }
+                            let resultFilemeGenero = await controllerFilmeGenero.inserirFilmeGenero(filmeGenero, contentType)
+                            console.log(resultFilemeGenero)
+                        });
+
                         //Adiciona no JSON o id criado no DB
                         filme.id                    =   lastIdFilme 
                         MESSAGE.HEADER.status       =   MESSAGE.SUCESS_CREATED_ITEM.status
