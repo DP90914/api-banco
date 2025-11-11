@@ -13,12 +13,14 @@ const MESSAGE_DEFAUT = require("../modulo/config_messages.js")
 const listarFilmesGeneros = async function() { 
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {
+        
         let result = await filmeGeneroDAO.getSelectAllFilmsGenres()
+        
         if(result){
             if(result.length > 0){
                 MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                 MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                MESSAGE.HEADER.response.filems_generos = result
+                MESSAGE.HEADER.response.filmes_generos = result
                 return MESSAGE.HEADER //200
             }else{
                 return MESSAGE.ERROR_NOT_FOUND //400
@@ -41,7 +43,7 @@ const buscarFilmesGenerosId = async function(id) {
                     if(result.length > 0){
                         MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                         MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                        MESSAGE.HEADER.response.filems_generos = result
+                        MESSAGE.HEADER.response.filmes_generos = result
                         return MESSAGE.HEADER
                     }else{
                         return MESSAGE.ERROR_NOT_FOUND //404
@@ -65,11 +67,14 @@ const listarGenerosIdFilme = async function(idFilme) {
         // validação de campo obrigatorio
         if(idFilme  != '' && idFilme != null && idFilme != undefined && !isNaN(idFilme) && idFilme > 0){
             let result = await filmeGeneroDAO.getSelectGenresByIDFilm(parseInt(idFilme))
+
             if(result){
                 if(result.length > 0){
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                     MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
                     MESSAGE.HEADER.response.films_generos = result
+
+
                     return MESSAGE.HEADER
                 }else{
                     return MESSAGE.ERROR_NOT_FOUND //404
@@ -97,7 +102,7 @@ const listarFilmesIdGenero = async function(idGenero) {
                 if(result.length > 0){
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                     MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
-                    MESSAGE.HEADER.response.filems_generos = result
+                    MESSAGE.HEADER.response.filmes_generos = result
                     return MESSAGE.HEADER
                 }else{
                     return MESSAGE.ERROR_NOT_FOUND //404
@@ -120,7 +125,7 @@ const inserirFilmeGenero = async function(filmeGenero, contentType) {
         if(String(contentType).toUpperCase() == 'APPLICATION/JSON'){
             //chama a função de validação dos dados de cadastro
             let validarDados = await validarDados1(filmeGenero)
-            if(validarDados){
+            if(!validarDados){
                 let result = await filmeGeneroDAO.setInsertFilmsGeners(filmeGenero)
                 if(result){
                     //Chama a função para receber o ID gerado no DB
@@ -146,7 +151,6 @@ const inserirFilmeGenero = async function(filmeGenero, contentType) {
             return MESSAGE.ERROR_CONTENT_TYPE //415
         }
     } catch (error) {
-        console.log(error)
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
@@ -215,10 +219,10 @@ const excluirFilmeGenero = async function(id) {
 const validarDados1 = async function(filmeGenero) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
 
-    if(filmeGenero.id_filme == "" || filmeGenero.id_filme == null ||filmeGenero.id_filme == undefined || filmeGenero.id_filme>0){
+    if(filmeGenero.id_filme == "" || filmeGenero.id_filme == null ||filmeGenero.id_filme == undefined){
         MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [id_filme] invalido'
         return MESSAGE.ERROR_REQUIRED_FIELDS//400
-    } else if(filmeGenero.id_genero == "" || filmeGenero.id_genero == null ||filmeGenero.id_genero == undefined || filmeGenero.id_genero>0){
+    } else if(filmeGenero.id_genero == "" || filmeGenero.id_genero == null ||filmeGenero.id_genero == undefined){
         MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = 'Atributo [id_genero] invalido'
         return MESSAGE.ERROR_REQUIRED_FIELDS//400
     } else {

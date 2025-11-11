@@ -24,7 +24,6 @@ const getSelectAllFilmsGenres = async function(){
             return false
         }
     } catch (error) {
-        console.log(error)
         return false
     }
 }
@@ -40,7 +39,6 @@ const getSelectFilmsGenresByID = async function(id){
             return false
         }
     } catch (error) {
-        console.log(error)
         return false
     }
 }
@@ -53,7 +51,7 @@ const getSelectGenresByIDFilm = async function(idFilme){
                             on tbl_filme.id = tbl_filme_genero.id_filme
                         inner join tbl_genero
                             on tbl_genero.id = tbl_filme_genero.id_genero
-                    where id_filme=${idFilme}`
+                    where tbl_filme.id=${idFilme}`
         let result = await prisma.$queryRawUnsafe(sql)
 
         if(Array.isArray(result)){
@@ -62,7 +60,6 @@ const getSelectGenresByIDFilm = async function(idFilme){
             return false
         }
     } catch (error) {
-        console.log(error)
         return false
     }
 }
@@ -84,7 +81,6 @@ const getSelectFilmsByIDGenre= async function(idGenero){
             return false
         }
     } catch (error) {
-        console.log(error)
         return false
     }
 }
@@ -95,7 +91,6 @@ const getSelectLastId = async function(){
         let result = await prisma.$queryRawUnsafe(sql)
 
         if(Array.isArray(result)){
-            console.log(result)
             return Number(result[0].id)
         }else{
             return false
@@ -150,7 +145,6 @@ const setDeleteFilmsGeners = async function(id){
             return false
         }
     } catch (error) {
-        console.log(error)
         return false
     }
 }
