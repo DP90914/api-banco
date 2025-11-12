@@ -5,6 +5,7 @@
  * Versão:      1.0
  *************************************************************************************************/
 
+const res = require("express/lib/response")
 const { PrismaClient } = require("../../generated/prisma")
 
 const prisma = new PrismaClient()
@@ -31,7 +32,9 @@ const getSelectAllFilmsGenres = async function(){
 const getSelectFilmsGenresByID = async function(id){
     try {
         let sql = `select * from tbl_filme_genero where id=${id}`
+
         let result = await prisma.$queryRawUnsafe(sql)
+
 
         if(Array.isArray(result)){
             return result
@@ -149,6 +152,20 @@ const setDeleteFilmsGeners = async function(id){
     }
 }
 
+const setDeleteGenersByIdFilme = async function(id_filme) {
+    try{
+        let sql = `delete from tbl_filme_genero where id_filme = ${id_filme}`
+        console.log(sql)
+        let result = await prisma.$queryRawUnsafe(sql)
+        if(Array.isArray(result)){
+            return result
+        }
+    }catch(error){
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     getSelectFilmsByIDGenre,
     getSelectAllFilmsGenres,
@@ -157,5 +174,6 @@ module.exports = {
     getSelectLastId,
     setUpdateFilmsGeners,
     setInsertFilmsGeners,
-    setDeleteFilmsGeners
+    setDeleteFilmsGeners,
+    setDeleteGenersByIdFilme
 }

@@ -59,6 +59,15 @@ const buscarFilmeId = async function(id) {
             let result = await filmeDAO.getSelectByIdFilms(parseInt(id))
             if(result){
                 if(result.length > 0){
+                    for(filme of result){
+                        let resultGeneros = await controllerFilmeGenero.listarGenerosIdFilme(filme.id)
+                        
+                        if(resultGeneros.status_code ==200){
+                            filme.genero = resultGeneros.response
+    
+                        }
+                    }
+                    
                     MESSAGE.HEADER.status = MESSAGE.SUCESS_REQUEST.status
                     MESSAGE.HEADER.status_code = MESSAGE.SUCESS_REQUEST.status_code
                     MESSAGE.HEADER.response.film = result
@@ -77,7 +86,6 @@ const buscarFilmeId = async function(id) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
-listarFilmes()
 //Insere um novo fime
 const inserirFilme = async function(filme, contentType) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
@@ -151,8 +159,27 @@ const atualizarFilme = async function(filme, id, contentType) {
                 if(validarID.status_code == 200){
                     // Adicionado o ID no JSon com os dados do filme
                     filme.id = parseInt(id)
-                    let result = await filmeDAO.setUpdateFilme(filme)
-                    if(result){
+  
+   
+                        let deletedFilm = await controllerFilmeGenero.excluirGeneroIdFilme(filme.id)
+                        if(deletedFilm.status_code == 200){
+                            // console.log(deletedFilm.ok)
+                            for(genero of filme.genero){
+
+                                let filmeGenero = {
+                                    id_filme : filme.id,
+                                    id_genero : genero.id
+                                }
+                                let resultFilmeGenero = await controllerFilmeGenero.inserirFilmeGenero(filmeGenero, contentType)
+                                console.log(resultFilmeGenero)
+                                if(resultFilmeGenero.status_code != 201){
+                                    return MESSAGE.ERROR_RELATION_TABLE // 200, porem com problemas de relação
+                                }
+                            }
+
+                        }
+                        let result = await filmeDAO.setUpdateFilme(filme)
+                        if(result){
                         MESSAGE.HEADER.status       =   MESSAGE.SUCESS_UPDATED_ITEM.status
                         MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_UPDATED_ITEM.status_code
                         MESSAGE.HEADER.message      =   MESSAGE.SUCESS_UPDATED_ITEM.message
@@ -174,7 +201,6 @@ const atualizarFilme = async function(filme, id, contentType) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 }
-
 const excluirFilme = async function (id) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
     try {

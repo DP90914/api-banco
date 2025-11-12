@@ -36,6 +36,7 @@ const buscarFilmesGenerosId = async function(id) {
         //realizando uma copia do odjeto MESSAGE_DEFAUT, permitindo que as alterações desta função não interfira nas demais
         let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
         try {
+
             // validação de campo obrigatorio
             if(id != '' && id != null && id != undefined && !isNaN(id) && id > 0){
                 let result = await filmeGeneroDAO.getSelectFilmsGenresByID(parseInt(id))
@@ -56,6 +57,7 @@ const buscarFilmesGenerosId = async function(id) {
                 return MESSAGE.ERROR_REQUIRED_FIELDS // 400
             }
         } catch (error) {
+            console.log(error)
             return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
         }
 }
@@ -216,6 +218,31 @@ const excluirFilmeGenero = async function(id) {
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
+const excluirGeneroIdFilme = async function(id_filme) {
+    let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
+    try{
+        let validarDados = await listarGenerosIdFilme(id_filme)
+        console.log(validarDados)
+        if(validarDados.status_code == 200){
+            let result = await filmeGeneroDAO.setDeleteGenersByIdFilme(parseInt(id_filme))
+            if(result){
+                MESSAGE.HEADER.status       =   MESSAGE.SUCESS_DELETED_ITEM.status
+                MESSAGE.HEADER.status_code  =   MESSAGE.SUCESS_DELETED_ITEM.status_code
+                MESSAGE.HEADER.response     =   MESSAGE.SUCESS_DELETED_ITEM.message
+                return MESSAGE.HEADER //200
+            }else{
+                return MESSAGE.ERROR_NOT_FOUND//404
+            }
+        }else{
+            MESSAGE.ERROR_NOT_FOUND.invalid_field =  'atributo [ID] invalido'
+            return MESSAGE.ERROR_REQUIRED_FIELDS // 400
+        }
+
+    }catch(error){
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
+
+    }
+}
 const validarDados1 = async function(filmeGenero) {
     let MESSAGE = JSON.parse(JSON.stringify(MESSAGE_DEFAUT))
 
@@ -237,6 +264,7 @@ module.exports = {
     listarGenerosIdFilme,
     excluirFilmeGenero,
     atualizarFilmeGenero,
-    inserirFilmeGenero
+    inserirFilmeGenero,
+    excluirGeneroIdFilme
 
 }
